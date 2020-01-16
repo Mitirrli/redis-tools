@@ -147,6 +147,11 @@ class Queue implements QueueInterface
      */
     public function getItemByIndex($key, $index)
     {
+        $lLen = $this->redis->lLen($this->getKey($key));
+        if ($lLen < $index + 1) {
+            $index = 0;
+        }
+
         return $this->redis->lIndex($this->getKey($key), $index);
     }
 }
