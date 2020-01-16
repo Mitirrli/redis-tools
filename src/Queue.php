@@ -35,11 +35,6 @@ class Queue implements QueueInterface
     protected $persistent = true;
 
     /**
-     * @var string 队列key
-     */
-    protected $key = '';
-
-    /**
      * Queue constructor.
      * @param array $attributes
      * @throws \Exception
@@ -111,43 +106,47 @@ class Queue implements QueueInterface
             return redis.call('lpush', KEYS[1], ARGV[1])
         end";
 
-        return $this->redis->eval($lua, [$this->getKey(), $value]);
+        return $this->redis->eval($lua, [$this->getKey($key), $value]);
     }
 
     /**
-     * @param $key
-     * @return $this
+     * 格式化key
+     *
+     * @return string
+     * @throws \Exception
      */
-    public function key($key)
+    public function getKey($key)
     {
-        $this->key = sprintf(self::KEY_NAME, $key);
+        if ($key === '') {
+            throw new \Exception('Key no exists', '-1');
+        }
 
-        return $this;
+        return sprintf(self::KEY_NAME, $key);
     }
 
     /**
      * 获取key
      *
-     * @return string
-     * @throws \Exception
+     * @param $key
+     * @return $this
      */
-    public function getKey()
+    public function key($key)
     {
-        if (empty($this->key)) {
-            throw new \Exception('Key no exists', '-1');
-        }
+        $this->key = $key;
 
-        return $this->key;
+        return $this;
     }
 
     /**
      * 根据下标获取数据
      *
+     * @param $key
      * @param $index
+     * @return String
      * @throws \Exception
      */
-    public function getItemByIndex($index)
+    public function getItemByIndex($key, $index)
     {
-        $this->redis->lIndex($this->getKey(), $index);
+        return $this->redis->lIndex($this->getKey($key), $index);
     }
 }
