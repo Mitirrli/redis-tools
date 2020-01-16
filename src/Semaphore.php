@@ -2,18 +2,41 @@
 
 namespace Mitirrli\Queue;
 
+/**
+ * Class Semaphore
+ * @package Mitirrli\Queue
+ */
 class Semaphore
 {
+    /**
+     * @var
+     */
     protected $id;
 
+    /**
+     * @var
+     */
     protected $shmId;
 
+    /**
+     * @var
+     */
     protected $signal;
 
+    /**
+     * @var int
+     */
     protected $permission = 0655;
 
+    /**
+     * @var array
+     */
     protected $config = [];
 
+    /**
+     * Semaphore constructor.
+     * @param array $config
+     */
     public function __construct(array $config = [])
     {
         if ($config) {
@@ -43,6 +66,9 @@ class Semaphore
         $this->checkArea();
     }
 
+    /**
+     * 检测环境
+     */
     public function checkArea()
     {
         $this->shmId = shm_attach($this->id, 1024, $this->permission);
@@ -82,6 +108,14 @@ class Semaphore
         $sem_id = ftok(__FILE__, 's');
 
         $this->signal = sem_get($sem_id); // 信号量
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getValue()
+    {
+        return shm_get_var($this->shmId, 1);
     }
 
     /**
