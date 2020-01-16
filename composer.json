@@ -1,0 +1,19 @@
+{
+  "name": "mitirrli/redis-queue",
+  "description": "固定大小的redis队列",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "mitirrli",
+      "email": "phper.blue@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Mitirrli\\Queue\\": "./src/"
+    }
+  }
+}
