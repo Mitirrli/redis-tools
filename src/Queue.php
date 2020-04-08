@@ -1,104 +1,47 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mitirrli\Queue;
 
+use Predis\Client;
+
+/**
+ * Class Queue
+ * @package Mitirrli\Queue
+ */
 class Queue implements QueueInterface
 {
     /**
-     * @var int 队列长度
+     * @var int Queue Length
      */
-    protected $lLen = 50;
+    protected $lLen;
 
     /**
-     * @var null|\Redis Redis实例
+     * @var Client Redis Client
      */
-    protected $redis = null;
-
-    /**
-     * @var string Redis主机
-     */
-    protected $host = '127.0.0.1';
-
-    /**
-     * @var int 数据库
-     */
-    protected $database = 0;
-
-    /**
-     * @var string 密码
-     */
-    protected $password = '';
-
-    /**
-     * @var bool 是否持久连接
-     */
-    protected $persistent = true;
+    private $redis;
 
     /**
      * Queue constructor.
-     * @param array $attributes
-     * @throws \Exception
+     * @param int $lLen Queue Length
+     * @param array $options Redis Conf
      */
-    public function __construct(array $attributes = [])
+    public function __construct(int $lLen = 5, array $options = [])
     {
-        foreach ($attributes as $property => $value) {
-            if (property_exists($this, $property)) {
-                $this->$property = $value;
-            }
-        }
-
-        $this->checkEnv();
-        $this->connectRedis();
+        $this->lLen = $lLen;
+        $this->redis = new Client($options['parameters'] ?? [], $options['options'] ?? []);
     }
 
     /**
-     * 连接redis
+     * Left in, Right Out
+     * @param string $key
+     * @param string $value
+     * @return int
      */
-    public function connectRedis()
+    public function toList(string $key, string $value): int
     {
-        $this->redis = new \Redis();
-        //连接
-        $this->connect();
-        //连接数据库
-        $this->redis->select($this->database);
-        //验证
-        $this->redis->auth($this->password);
-    }
-
-    /**
-     * 连接redis
-     */
-    public function connect()
-    {
-        if ($this->persistent) {
-            $this->redis->pconnect($this->host);
-        }
-        $this->redis->connect($this->host);
-    }
-
-    /**
-     * redis环境检测
-     *
-     * @throws \Exception
-     */
-    final private function checkEnv()
-    {
-        if (!extension_loaded('redis')) {
-            throw new \Exception('缺少Redis扩展', 0);
-        }
-    }
-
-    /**
-     * 保存list至redis(左进右出)
-     *
-     * @param $key
-     * @param $value
-     * @return mixed
-     * @throws \Exception
-     */
-    public function toList($key, $value)
-    {
-        $lua = "if redis.call('llen', KEYS[1]) < tonumber({$this->lLen}})
+        $lua = "if redis.call('llen', KEYS[1]) < tonumber({$this->lLen})
         then
             return redis.call('lpush', KEYS[1], ARGV[1])
         else
@@ -106,46 +49,31 @@ class Queue implements QueueInterface
             return redis.call('lpush', KEYS[1], ARGV[1])
         end";
 
-        return $this->redis->eval($lua, [$this->getKey($key), $value]);
+        return $this->redis->eval($lua, 1, $this->getKey($key), $value);
     }
 
     /**
-     * 格式化key
-     *
+     * Format Key
+     * @param string $key
      * @return string
-     * @throws \Exception
+     * @throws KeyException
      */
-    public function getKey($key)
+    public function getKey(string $key): string
     {
         if ($key === '') {
-            throw new \Exception('Key no exists', '-1');
+            throw new KeyException('Key no exists', '-1');
         }
 
         return sprintf(self::KEY_NAME, $key);
     }
 
     /**
-     * 获取key
-     *
-     * @param $key
-     * @return $this
-     */
-    public function key($key)
-    {
-        $this->key = $key;
-
-        return $this;
-    }
-
-    /**
-     * 根据下标获取数据
-     *
+     * Get Data By Index
      * @param $key
      * @param $index
-     * @return String
-     * @throws \Exception
+     * @return string
      */
-    public function getItemByIndex($key, $index)
+    public function getItemByIndex(string $key, int $index): string
     {
         $lLen = $this->redis->lLen($this->getKey($key));
         if ($lLen < $index + 1) {
