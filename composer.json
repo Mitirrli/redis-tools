@@ -9,7 +9,8 @@
     }
   ],
   "require": {
-    "php": ">=7.0"
+    "php": ">=7.0",
+    "predis/predis": "^1.1"
   },
   "autoload": {
     "psr-4": {
