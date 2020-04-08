@@ -2,7 +2,14 @@
 
 namespace Mitirrli\Queue;
 
+/**
+ * Interface QueueInterface
+ * @package Mitirrli\Queue
+ */
 interface QueueInterface
 {
-    const KEY_NAME = 'LIST_%s';
+    /**
+     * Key Name
+     */
+    const KEY_NAME = 'fixed_queue_%s';
 }
