@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace Mitirrli\Queue;
 
+use Mitirrli\Constant\constant;
+use Mitirrli\Exception\KeyException;
 use Predis\Client;
 
 /**
  * Class Queue
  * @package Mitirrli\Queue
  */
-class Queue implements QueueInterface
+class Queue implements constant
 {
     /**
      * @var int Queue Length
@@ -64,7 +66,7 @@ class Queue implements QueueInterface
             throw new KeyException('Key no exists', '-1');
         }
 
-        return sprintf(self::KEY_NAME, $key);
+        return sprintf(self::QUEUE_NAME, $key);
     }
 
     /**

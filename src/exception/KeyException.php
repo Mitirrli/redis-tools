@@ -1,6 +1,6 @@
 <?php
 
-namespace Mitirrli\Queue;
+namespace Mitirrli\Exception;
 
 /**
  * Class KeyException

@@ -14,7 +14,10 @@
   },
   "autoload": {
     "psr-4": {
-      "Mitirrli\\Queue\\": "./src/"
+      "Mitirrli\\Queue\\": "./src/Queue/",
+      "Mitirrli\\Lock\\": "./src/Lock/",
+      "Mitirrli\\Constant\\": "./src/interface/",
+      "Mitirrli\\Exception\\": "./src/exception/"
     }
   }
 }
