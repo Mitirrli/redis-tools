@@ -3,6 +3,7 @@
 namespace Mitirrli\Lock;
 
 use Mitirrli\Constant\constant;
+use Mitirrli\Exception\KeyException;
 
 /**
  * Class Lock
@@ -34,6 +35,7 @@ class Lock implements constant
      * Lock constructor.
      * @param array $attributes
      * @param array $options Redis Conf
+     * @throws KeyException
      */
     public function __construct(array $attributes, array $options = [])
     {
@@ -59,9 +61,15 @@ class Lock implements constant
     /**
      * 设置Key.
      * @return string
+     * @throws KeyException
      */
     public function setKey()
     {
+        // key不能为空
+        if (empty($this->key)) {
+            throw new KeyException('Key can not be empty string.', '1004');
+        }
+
         return sprintf(self::LOCK_NAME, $this->key);
     }
 
@@ -69,15 +77,9 @@ class Lock implements constant
     /**
      * 加锁
      * @return mixed
-     * @throws \Exception
      */
     public function lock()
     {
-        // key不能为空
-        if (empty($this->key)) {
-            throw new \Exception('Key can not be empty string.', '1004');
-        }
-
         $result = $this->redis->set($this->key, $this->val, 'NX', 'EX', $this->time);
         return is_null($result) ? 0 : 1;
     }
