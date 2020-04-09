@@ -9,14 +9,14 @@
 
 ### 固定大小的redis队列
 ```
-1. easy example:
+easy example:
 
 $queue = new Queue(6);
 ```
 
 ### redis分布式锁
 ```
-1. easy example:
+easy example:
 
 $conf = [
   'time' => 10,
