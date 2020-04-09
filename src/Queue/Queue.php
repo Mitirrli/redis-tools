@@ -20,19 +20,26 @@ class Queue implements constant
     protected $lLen;
 
     /**
+     * @var Queue Key
+     */
+    protected $key;
+
+    /**
      * @var Client Redis Client
      */
     private $redis;
 
     /**
      * Queue constructor.
+     * @param string $key Queue Key
      * @param int $lLen Queue Length
-     * @param array $options Redis Conf
+     * @param array|object $mix Redis Conf or Redis Instance
      */
-    public function __construct(int $lLen = 5, array $options = [])
+    public function __construct(string $key, int $lLen = 5, $mix = [])
     {
+        $this->key = $this->getKey($key);
         $this->lLen = $lLen;
-        $this->redis = new Client($options['parameters'] ?? [], $options['options'] ?? []);
+        $this->redis = ($mix instanceof Client) ? $mix : new Client($mix['parameters'] ?? [], $mix['options'] ?? []);
     }
 
     /**
@@ -41,7 +48,7 @@ class Queue implements constant
      * @param string $value
      * @return int
      */
-    public function toList(string $key, string $value): int
+    public function toList(string $value)
     {
         $lua = "if redis.call('llen', KEYS[1]) < tonumber({$this->lLen})
         then
@@ -70,18 +77,29 @@ class Queue implements constant
     }
 
     /**
+     * The length of queue
+     * @param string $key
+     * @return int
+     * @throws KeyException
+     */
+    public function lLen()
+    {
+        return $this->redis->lLen($this->key);
+    }
+
+    /**
      * Get Data By Index
      * @param $key
      * @param $index
      * @return string
      */
-    public function getItemByIndex(string $key, int $index): string
+    public function getItemByIndex(int $index): string
     {
-        $lLen = $this->redis->lLen($this->getKey($key));
+        $lLen = $this->redis->lLen($this->key);
         if ($lLen < $index + 1) {
             $index = 0;
         }
 
-        return $this->redis->lIndex($this->getKey($key), $index);
+        return $this->redis->lIndex($this->key, $index) ?? '';
     }
 }
