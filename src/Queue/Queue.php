@@ -58,7 +58,7 @@ class Queue implements constant
             return redis.call('lpush', KEYS[1], ARGV[1])
         end";
 
-        return $this->redis->eval($lua, 1, $this->getKey($key), $value);
+        return $this->redis->eval($lua, 1, $this->key, $value);
     }
 
     /**
