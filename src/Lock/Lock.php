@@ -3,6 +3,7 @@
 namespace Mitirrli\Lock;
 
 use Mitirrli\Constant\constant;
+use Predis\Client;
 use Mitirrli\Exception\KeyException;
 
 /**
