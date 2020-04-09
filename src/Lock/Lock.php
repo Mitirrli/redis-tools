@@ -35,10 +35,10 @@ class Lock implements constant
     /**
      * Lock constructor.
      * @param array $attributes
-     * @param array $options Redis Conf
+     * @param array|object $mix Redis Conf or Redis Instance
      * @throws KeyException
      */
-    public function __construct(array $attributes, array $options = [])
+    public function __construct(array $attributes, $mix = [])
     {
         foreach ($attributes as $property => $value) {
             if (property_exists($this, $property)) {
@@ -47,7 +47,7 @@ class Lock implements constant
         }
         $this->key = $this->setKey();
         $this->val = $this->setValue();
-        $this->redis = new Client($options['parameters'] ?? [], $options['options'] ?? []);
+        $this->redis = ($mix instanceof Client) ? $mix : new Client($mix['parameters'] ?? [], $mix['options'] ?? []);
     }
 
     /**
@@ -103,5 +103,3 @@ class Lock implements constant
         return $this->redis->eval($lua, 1, $this->key, $this->val);
     }
 }
-
-
