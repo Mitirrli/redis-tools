@@ -4,7 +4,7 @@ namespace Mitirrli\Exception;
 
 /**
  * Class KeyException
- * @package Mitirrli\Queue
+ * @package Mitirrli\Exception
  */
 class KeyException extends \Exception
 {

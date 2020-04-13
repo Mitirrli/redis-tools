@@ -4,7 +4,7 @@ namespace Mitirrli\Constant;
 
 /**
  * Interface constant
- * @package Mitirrli\Queue
+ * @package Mitirrli\Constant
  */
 interface constant
 {
