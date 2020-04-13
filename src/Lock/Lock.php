@@ -15,7 +15,7 @@ class Lock implements constant
     /**
      * @var int Lock Time
      */
-    protected $time;
+    protected $time = 10;
 
     /**
      * @var Redis

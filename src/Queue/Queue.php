@@ -6,7 +6,6 @@ namespace Mitirrli\Queue;
 
 use Mitirrli\Constant\constant;
 use Mitirrli\Exception\KeyException;
-use Predis\Client;
 
 /**
  * Class Queue
@@ -25,26 +24,30 @@ class Queue implements constant
     protected $key;
 
     /**
-     * @var Client Redis Client
+     * @var \Redis
      */
     private $redis;
 
     /**
      * Queue constructor.
-     * @param string $key Queue Key
-     * @param int $lLen Queue Length
-     * @param array|object $mix Redis Conf or Redis Instance
+     * @param $redis
+     * @param $config
+     * @throws KeyException
      */
-    public function __construct(string $key, int $lLen = 5, $mix = [])
+    public function __construct($redis, $config)
     {
-        $this->key = $this->getKey($key);
-        $this->lLen = $lLen;
-        $this->redis = ($mix instanceof Client) ? $mix : new Client($mix['parameters'] ?? [], $mix['options'] ?? []);
+        foreach ($config as $property => $value) {
+            if (property_exists($this, $property)) {
+                $this->$property = $value;
+            }
+        }
+
+        $this->redis = $redis;
+        $this->key = $this->getKey();
     }
 
     /**
      * Left in, Right Out
-     * @param string $key
      * @param string $value
      * @return int
      */
@@ -58,29 +61,26 @@ class Queue implements constant
             return redis.call('lpush', KEYS[1], ARGV[1])
         end";
 
-        return $this->redis->eval($lua, 1, $this->key, $value);
+        return $this->redis->eval($lua, [$this->key, $value], 1);
     }
 
     /**
      * Format Key
-     * @param string $key
      * @return string
      * @throws KeyException
      */
-    public function getKey(string $key): string
+    public function getKey(): string
     {
-        if ($key === '') {
+        if ($this->key === '') {
             throw new KeyException('Key no exists', '-1');
         }
 
-        return sprintf(self::QUEUE_NAME, $key);
+        return sprintf(self::QUEUE_NAME, $this->key);
     }
 
     /**
      * The length of queue
-     * @param string $key
      * @return int
-     * @throws KeyException
      */
     public function lLen()
     {
@@ -89,11 +89,10 @@ class Queue implements constant
 
     /**
      * Get Data By Index
-     * @param $key
-     * @param $index
-     * @return string
+     * @param int $index
+     * @return bool|mixed|string
      */
-    public function getItemByIndex(int $index): string
+    public function getItemByIndex(int $index)
     {
         $lLen = $this->redis->lLen($this->key);
         if ($lLen < $index + 1) {

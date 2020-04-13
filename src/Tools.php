@@ -53,24 +53,30 @@ class Tools
     /**
      * 设置配置项
      * @param array $params
+     * @return Tools
      */
     public function setConfig(array $params)
     {
         $this->config = $params;
+
+        return $this;
     }
 
 
     /**
      * Magic Method .
+     * @param $name
+     * @return Lock|Queue
+     * @throws Exception\KeyException
      */
     public function __get($name)
     {
         switch ($name) {
             case 'lock':
                 return new Lock($this->redis, $this->config);
-//
-//            case 'queue':
-//                return new Queue();
+
+            case 'queue':
+                return new Queue($this->redis, $this->config);
         }
     }
 }
