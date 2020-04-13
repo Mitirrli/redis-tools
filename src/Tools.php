@@ -2,16 +2,26 @@
 
 namespace Mitirrli;
 
-use Mitirrli\Exception\RedisException;
 use Mitirrli\Lock\Lock;
+use Mitirrli\Queue\Queue;
 use Redis;
 
+/**
+ * Class Tools
+ * @property Lock $lock
+ * @property Queue $queue
+ */
 class Tools
 {
     /**
      * @var Redis
      */
     protected $redis;
+
+    /**
+     * @var array 配置文件
+     */
+    protected $config;
 
     /**
      * @return Tools

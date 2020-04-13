@@ -77,7 +77,7 @@ class Lock implements constant
 
 
     /**
-     * Lock
+     * 加锁 .
      * @return bool
      */
     public function lock()
@@ -86,9 +86,7 @@ class Lock implements constant
     }
 
     /**
-     * 解锁.
-     * @param $key
-     * @param $val
+     * 解锁 .
      * @return mixed
      */
     public function unlock()
