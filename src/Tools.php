@@ -9,21 +9,16 @@ use Redis;
 class Tools
 {
     /**
-     * @var Tools
-     */
-    protected static $app;
-
-    /**
      * @var Redis
      */
     protected $redis;
 
     /**
-     * Tools constructor.
+     * @return Tools
      */
-    public function __construct()
+    public static function init()
     {
-        self::$app = new self();
+        return new self();
     }
 
     /**
