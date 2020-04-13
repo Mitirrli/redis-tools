@@ -3,8 +3,8 @@
 namespace Mitirrli\Lock;
 
 use Mitirrli\Constant\constant;
-use Predis\Client;
 use Mitirrli\Exception\KeyException;
+use Redis;
 
 /**
  * Class Lock
@@ -18,36 +18,37 @@ class Lock implements constant
     protected $time;
 
     /**
-     * @var Client Redis Client
+     * @var Redis
      */
     protected $redis;
 
     /**
-     * @var Lock Key
+     * @var string
      */
     protected $key;
 
     /**
-     * @var Lock Val
+     * @var string
      */
     protected $val;
 
     /**
      * Lock constructor.
-     * @param array $attributes
-     * @param array|object $mix Redis Conf or Redis Instance
+     * @param $redis
+     * @param $config
      * @throws KeyException
      */
-    public function __construct(array $attributes, $mix = [])
+    public function __construct($redis, $config)
     {
-        foreach ($attributes as $property => $value) {
+        foreach ($config as $property => $value) {
             if (property_exists($this, $property)) {
                 $this->$property = $value;
             }
         }
+
+        $this->redis = $redis;
         $this->key = $this->setKey();
         $this->val = $this->setValue();
-        $this->redis = ($mix instanceof Client) ? $mix : new Client($mix['parameters'] ?? [], $mix['options'] ?? []);
     }
 
     /**
@@ -76,13 +77,12 @@ class Lock implements constant
 
 
     /**
-     * 加锁
-     * @return mixed
+     * Lock
+     * @return bool
      */
     public function lock()
     {
-        $result = $this->redis->set($this->key, $this->val, 'NX', 'EX', $this->time);
-        return is_null($result) ? 0 : 1;
+        return $this->redis->set($this->key, $this->val, ['nx', 'ex' => $this->time]);
     }
 
     /**
@@ -100,6 +100,6 @@ class Lock implements constant
             return 0 
         end";
 
-        return $this->redis->eval($lua, 1, $this->key, $this->val);
+        return $this->redis->eval($lua, [$this->key, $this->val], 1);
     }
 }

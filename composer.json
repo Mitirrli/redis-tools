@@ -1,6 +1,6 @@
 {
   "name": "mitirrli/redis-tools",
-  "keywords": ["tools", "redis", "predis"],
+  "keywords": ["tools", "redis"],
   "homepage": "https://github.com/Mitirrli/redis-tools",
   "description": "固定大小的redis队列,分布式锁",
   "license": "MIT",
@@ -12,15 +12,11 @@
   ],
   "require": {
     "php": ">=7.0",
-    "predis/predis": "^1.1"
+    "ext-redis": "*"
   },
   "autoload": {
     "psr-4": {
       "Mitirrli\\": "./src/"
     }
-  },
-  "suggest": {
-    "ext-phpiredis": "Allows faster serialization and deserialization of the Redis protocol",
-    "ext-curl": "Allows access to Webdis when paired with phpiredis"
   }
 }
