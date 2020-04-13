@@ -39,7 +39,7 @@ class Tools
      * @param int $index
      * @return $this
      */
-    public function build($host = '127.0.0.1', $port = '6379', $password = '', $index = 0)
+    public function create($host = '127.0.0.1', $port = '6379', $password = '', $index = 0)
     {
         $this->redis = new Redis();
 
@@ -53,7 +53,7 @@ class Tools
     /**
      * 设置配置项
      * @param array $params
-     * @return Tools
+     * @return $this
      */
     public function setConfig(array $params)
     {
@@ -61,7 +61,6 @@ class Tools
 
         return $this;
     }
-
 
     /**
      * Magic Method .
