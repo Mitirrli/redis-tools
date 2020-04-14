@@ -21,52 +21,45 @@ class Tools
     protected $redis;
 
     /**
+     * @var string 类型
+     */
+    protected $type;
+
+    /**
      * @var array 配置文件
      */
     protected $config;
 
     /**
-     * @param string $type
-     * @return Tools
-     */
-    public static function init()
-    {
-        return new self();
-    }
-
-    /**
-     * 创建连接
+     * Tools constructor.
      * @param string $host
      * @param string $port
      * @param string $password
      * @param int $index
-     * @return $this
      */
-    public function create($host = '127.0.0.1', $port = '6379', $password = '', $index = 0)
+    public function __construct($host = '127.0.0.1', $port = '6379', $password = '', $index = 0)
     {
         $this->redis = new Redis();
+
+        if ($this->type == 'tp') {
+            $host = Env::get('REDIS_HOST');
+            $port = Env::get('REDIS_PORT');
+            $password = Env::get('REDIS_PASSWORD');
+            $index = Env::get('REDIS_DB');
+        }
 
         $this->redis->pconnect($host, $port);
         $this->redis->auth($password);
         $this->redis->select($index);
-
-        return $this;
     }
 
     /**
-     * thinkphp框架直接读取env配置
-     * @param string $db
-     * @return $this
+     * 选择数据库
+     * @param $db
      */
-    public function build($db = '')
+    public function selectDb($db)
     {
-        $this->redis = new Redis();
-
-        $this->redis->pconnect(Env::get('REDIS_HOST'), Env::get('REDIS_PORT'));
-        $this->redis->auth(Env::get('REDIS_PASSWORD'));
-        $this->redis->select(empty($db) ? Env::get('REDIS_DB') : $db);
-
-        return $this;
+        $this->redis->select($db);
     }
 
     /**
@@ -84,12 +77,16 @@ class Tools
     /**
      * Magic Method .
      * @param $name
-     * @return Lock|Queue
+     * @return Tools|Lock|Queue
      * @throws Exception\KeyException
      */
     public function __get($name)
     {
         switch ($name) {
+            case 'tp':
+                $this->type = $name;
+                return $this;
+
             case 'lock':
                 return new Lock($this->redis, $this->config);
 
