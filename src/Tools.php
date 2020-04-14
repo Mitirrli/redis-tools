@@ -57,10 +57,13 @@ class Tools
     /**
      * 选择数据库
      * @param $db
+     * @return Tools
      */
     public function selectDb($db)
     {
         $this->redis->select($db);
+
+        return $this;
     }
 
     /**
