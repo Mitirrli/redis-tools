@@ -4,6 +4,7 @@ namespace Mitirrli\Lock;
 
 use Mitirrli\Constant\constant;
 use Mitirrli\Exception\KeyException;
+use Mitirrli\Tools;
 use Redis;
 
 /**
@@ -38,7 +39,7 @@ class Lock implements constant
      * @param $config
      * @throws KeyException
      */
-    public function __construct($redis, $config)
+    public function __construct($config = [], $redis = [])
     {
         foreach ($config as $property => $value) {
             if (property_exists($this, $property)) {
@@ -46,7 +47,7 @@ class Lock implements constant
             }
         }
 
-        $this->redis = $redis;
+        $this->redis = new Tools($redis);
         $this->key = $this->setKey();
         $this->val = $this->setValue();
     }
