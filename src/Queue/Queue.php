@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Mitirrli\Queue;
 
+use Mitirrli\Client;
 use Mitirrli\Constant\constant;
 use Mitirrli\Exception\KeyException;
+use Redis;
 
 /**
  * Class Queue
@@ -14,17 +16,17 @@ use Mitirrli\Exception\KeyException;
 class Queue implements constant
 {
     /**
-     * @var int Queue Length
+     * @var int 队列长度
      */
-    protected $lLen;
+    protected $lLen = 10;
 
     /**
-     * @var Queue Key
+     * @var Queue 队列名
      */
     protected $key;
 
     /**
-     * @var \Redis
+     * @var Redis
      */
     private $redis;
 
@@ -34,7 +36,7 @@ class Queue implements constant
      * @param $config
      * @throws KeyException
      */
-    public function __construct($redis, $config)
+    public function __construct($config, $redis)
     {
         foreach ($config as $property => $value) {
             if (property_exists($this, $property)) {
@@ -42,8 +44,22 @@ class Queue implements constant
             }
         }
 
-        $this->redis = $redis;
+        $this->redis = Client::app()->make($redis);;
         $this->key = $this->getKey();
+    }
+
+    /**
+     * Format Key
+     * @return string
+     * @throws KeyException
+     */
+    public function getKey(): string
+    {
+        if ($this->key === '') {
+            throw new KeyException('Key no exists', '-1');
+        }
+
+        return sprintf(self::QUEUE_NAME, $this->key);
     }
 
     /**
@@ -62,29 +78,6 @@ class Queue implements constant
         end";
 
         return $this->redis->eval($lua, [$this->key, $value], 1);
-    }
-
-    /**
-     * Format Key
-     * @return string
-     * @throws KeyException
-     */
-    public function getKey(): string
-    {
-        if ($this->key === '') {
-            throw new KeyException('Key no exists', '-1');
-        }
-
-        return sprintf(self::QUEUE_NAME, $this->key);
-    }
-
-    /**
-     * The length of queue
-     * @return int
-     */
-    public function lLen()
-    {
-        return $this->redis->lLen($this->key);
     }
 
     /**
