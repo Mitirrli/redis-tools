@@ -4,7 +4,7 @@ namespace Mitirrli\Lock;
 
 use Mitirrli\Constant\constant;
 use Mitirrli\Exception\KeyException;
-use Mitirrli\Tools;
+use Mitirrli\Client;
 use Redis;
 
 /**
@@ -47,7 +47,7 @@ class Lock implements constant
             }
         }
 
-        $this->redis = new Tools($redis);
+        $this->redis = new Client($redis);
         $this->key = $this->setKey();
         $this->val = $this->setValue();
     }
