@@ -65,7 +65,7 @@ class Queue implements constant
     /**
      * Left in, Right Out
      * @param string $value
-     * @return int
+     * @return int 队列元素数目
      */
     public function toList(string $value)
     {
