@@ -10,6 +10,7 @@ use think\Env;
 
 /**
  * Class Tools
+ * @property Tools $tp
  * @property Lock $lock
  * @property Queue $queue
  */
