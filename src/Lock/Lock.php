@@ -47,7 +47,7 @@ class Lock implements constant
             }
         }
 
-        $this->redis = new Client($redis);
+        $this->redis = Client::app()->make($redis);
         $this->key = $this->setKey();
         $this->val = $this->setValue();
     }

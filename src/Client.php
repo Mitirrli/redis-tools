@@ -11,10 +11,20 @@ use Redis;
 class Client
 {
     /**
-     * Tools constructor.
-     * @param $redis
+     * 返回Client
+     * @return Client
      */
-    public function __construct(array $redis)
+    public static function app()
+    {
+        return new self();
+    }
+
+    /**
+     * 创建redis
+     * @param array $redis
+     * @return Redis
+     */
+    public function make(array $redis)
     {
         $client = new Redis();
 
