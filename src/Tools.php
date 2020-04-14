@@ -10,7 +10,6 @@ use think\Env;
 
 /**
  * Class Tools
- * @property Tools $tp
  * @property Lock $lock
  * @property Queue $queue
  */
@@ -20,11 +19,6 @@ class Tools
      * @var Redis
      */
     protected $redis;
-
-    /**
-     * @var string 类型
-     */
-    protected $type;
 
     /**
      * @var array 配置文件
@@ -42,16 +36,9 @@ class Tools
     {
         $this->redis = new Redis();
 
-        if ($this->type == 'tp') {
-            $host = Env::get('REDIS_HOST');
-            $port = Env::get('REDIS_PORT');
-            $password = Env::get('REDIS_PASSWORD');
-            $index = Env::get('REDIS_DB');
-        }
-
-        $this->redis->pconnect($host, $port);
-        $this->redis->auth($password);
-        $this->redis->select($index);
+        $this->redis->pconnect(isset($host) ? $host : Env::get('REDIS_HOST'), isset($port) ? $port : Env::get('REDIS_PORT'));
+        $this->redis->auth(isset($password) ? $password : Env::get('REDIS_PASSWORD'));
+        $this->redis->select(isset($index) ? $index : Env::get('REDIS_DB'));
     }
 
     /**
@@ -81,16 +68,12 @@ class Tools
     /**
      * Magic Method .
      * @param $name
-     * @return Tools|Lock|Queue
+     * @return Lock|Queue
      * @throws Exception\KeyException
      */
     public function __get($name)
     {
         switch ($name) {
-            case 'tp':
-                $this->type = $name;
-                return $this;
-
             case 'lock':
                 return new Lock($this->redis, $this->config);
 
