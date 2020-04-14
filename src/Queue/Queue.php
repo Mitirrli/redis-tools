@@ -81,6 +81,15 @@ class Queue implements constant
     }
 
     /**
+     * The length of queue
+     * @return int
+     */
+    public function lLen()
+    {
+        return $this->redis->lLen($this->key);
+    }
+
+    /**
      * Get Data By Index
      * @param int $index
      * @return bool|mixed|string
