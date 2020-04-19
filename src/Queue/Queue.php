@@ -36,7 +36,7 @@ class Queue implements constant
      * @param $config
      * @throws KeyException
      */
-    public function __construct($config, $redis)
+    public function __construct($config = [], $redis = [])
     {
         foreach ($config as $property => $value) {
             if (property_exists($this, $property)) {
