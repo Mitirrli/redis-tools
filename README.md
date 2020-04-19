@@ -8,9 +8,11 @@
 
 
 ### 固定大小的redis队列
+```
 $Lock = new \Mitirrli\Queue\Queue(['key' => 'test', 'lLen' => 10]]);
 
 $Lock->toList('a');
+```
 
 ### redis分布式锁
 ```
