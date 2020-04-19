@@ -8,17 +8,17 @@
 
 
 ### 固定大小的redis队列
-```
-$queue = new Queue(6);
-```
+$Lock = new \Mitirrli\Queue\Queue(['key' => 'test', 'lLen' => 10]]);
+
+$Lock->toList('a');
 
 ### redis分布式锁
 ```
-$conf = [
-  'time' => 10,
-  'key' => 'test'    
-];
-$lock = new Lock($conf);
-$lock->lock();//加锁
-$lock->unlock();//解锁
+$Lock = new \Mitirrli\Lock\Lock(['key' => 'test']);
+
+//业务逻辑占用锁
+$Lock->lock();
+
+//解锁
+$Lock->unlock();
 ```
