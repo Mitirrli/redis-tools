@@ -1,4 +1,4 @@
-This package is Abandoned。
+This package is Abandoned.
 
 <h1 align="center"> Redis Tools </h1>
 <p align="center">:rainbow: 基于redis的一些组件</p>
